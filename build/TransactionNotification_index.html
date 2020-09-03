@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<style>
+    /*まずはお決まりのボックスサイズ算出をborer-boxに */
+    *,
+    *:before,
+    *:after {
+        -webkit-box-sizing: inherit;
+        box-sizing: inherit;
+    }
+
+    html {
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        font-size: 62.5%;/*rem算出をしやすくするために*/
+    }
+
+    .btn,
+    a.btn,
+    button.btn {
+        font-size: 1.6rem;
+        font-weight: 700;
+        line-height: 1.5;
+        position: relative;
+        display: inline-block;
+        padding: 1rem 4rem;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        text-align: center;
+        vertical-align: middle;
+        text-decoration: none;
+        letter-spacing: 0.1em;
+        color: #212529;
+        border-radius: 0.5rem;
+    }
+
+    a.btn-border {
+        border: 2px solid #000;
+        border-radius: 0;
+        background: #fff;
+    }
+
+    a.btn-border:before {
+        position: absolute;
+        top: 0;
+        left: 0;
+
+        width: 5px;
+        height: 100%;
+
+        content: '';
+
+        background: #9FD9F6;
+    }
+
+    a.btn-border:hover {
+        color: #fff;
+        background: #9FD9F6;
+    }
+
+    a.btn-border:hover:before {
+        background: #fff;
+    }
+    .next-area {
+        opacity: 0;
+        transition: opacity 0.5s ease;
+    }
+    .next-area.is-active {
+        opacity: 1;
+    }
+    .hide {
+        display: none;
+    }
+    .cp_iptxt {
+        position: relative;
+    }
+    .cp_iptxt input[type='text'] {
+        font: 15px/24px sans-serif;
+        box-sizing: border-box;
+        width: 100%;
+        padding: 0.3em;
+        letter-spacing: 1px;
+        border: 0;
+        margin-top: 25px;
+    }
+    .cp_iptxt input[type='text']:focus {
+        outline: none;
+    }
+    .cp_iptxt input[type='text']:focus::after {
+        outline: none;
+    }
+    .cp_iptxt::after {
+        display: block;
+        width: 100%;
+        height: 4px;
+        margin-top: -1px;
+        content: '';
+        border-width: 0 1px 1px 1px;
+        border-style: solid;
+        border-color: #9FD9F6;
+    }
+    .btn-flat-border {
+        display: inline-block;
+        padding: 0.3em 1em;
+        text-decoration: none;
+        color: #67c5ff;
+        border: solid 2px #9FD9F6;
+        border-radius: 3px;
+        transition: .4s;
+        font-size: large;
+        margin-top: 5px;
+    }
+
+    .btn-flat-border:hover {
+        background: #67c5ff;
+        color: white;
+    }
+
+    label.subtitle {
+        font-size: x-large;
+        color: gray;
+        border-width: 0px 0px 0px 10px;
+        border-color: #9FD9F6;
+        border-style: solid;
+        padding-left: 3px;
+        margin-left: -10px;
+    }
+</style>
+<body>
+<div id="btn-area" class="next-area is-active">
+    <label  for="ticket-number" class="subtitle">Redmineの内容でガントチャートを更新する</label>
+    <div class="cp_iptxt">
+        <input id="ticket-number" type="text" placeholder="表示したいチケット番号を入力してください。(#不要)" />
+    </div>
+    <a id="btn-update-gantchart" class="btn-flat-border" type="button">実行</a>
+</div>
+<script type="text/javascript">
+    // google.script.run
+    //     .withSuccessHandler(test)
+    //     .receiveTicketNumber();
+    (function(){
+        const redmineButton = document.getElementById("menu-btn-update-redmine");
+        const gantChartButton = document.getElementById("menu-btn-update-gantchart");
+        const updateGantChartButton = document.getElementById("btn-update-gantchart");
+        const updateGantChartActiveSheetButton = document.getElementById("menu-btn-update-gantchart-active-sheet");
+        const updateGantChartAllSheetButton = document.getElementById("menu-btn-update-gantchart-all-sheet");
+
+        const transitionMethod = function(id) {
+            const updateRedmineArea = document.getElementById(id);
+            updateRedmineArea.setAttribute("class", "next-area is-active");
+        };
+
+        redmineButton.onclick = function() {
+            const btnArea = document.getElementById("btn-area");
+            const updateRedmineArea = document.getElementById('update-redmine-area');
+            const hideArea = document.getElementById('update-gantchart-area');
+            btnArea.addEventListener('transitionend', function () {
+                btnArea.style.display="none";
+                updateRedmineArea.setAttribute("class", "next-area is-active");
+                hideArea.setAttribute("class", "hide");
+            });
+            btnArea.setAttribute("class", "next-area");
+        };
+
+        gantChartButton.onclick = function() {
+            const btnArea = document.getElementById("btn-area");
+            const updateRedmineArea = document.getElementById('update-gantchart-area');
+            const hideArea = document.getElementById('update-redmine-area');
+            btnArea.addEventListener('transitionend', function () {
+                btnArea.style.display="none";
+                updateRedmineArea.setAttribute("class", "next-area is-active");
+                hideArea.setAttribute("class", "hide");
+            });
+            btnArea.setAttribute("class", "next-area");
+        };
+
+        updateGantChartButton.onclick = function() {
+            const successUpdateGantChart = function(){
+                alert("正常に更新されました。");
+            };
+            const ticketNumber = document.getElementById("ticket-number").value;
+            google.script.run
+                .withSuccessHandler(successUpdateGantChart())
+                .receiveTicketNumber(ticketNumber);
+        };
+
+        updateGantChartActiveSheetButton.onclick = function() {
+            const successUpdateGantChart = function(){
+                alert("正常に更新されました。");
+            };
+            google.script.run
+                .withSuccessHandler(successUpdateGantChart())
+                .updateRedmine("ACTIVE");
+        };
+
+        updateGantChartAllSheetButton.onclick = function () {
+            const successUpdateGantChart = function(){
+                alert("正常に更新されました。");
+            };
+            google.script.run
+                .withSuccessHandler(successUpdateGantChart())
+                .updateRedmine("All");
+
+        };
+
+    })();
+</script>
+</body>
+</html>
